@@ -1,0 +1,5 @@
+<ul>
+  <li *ngFor="let pokemon of pokemons.results">
+    {{ pokemon.name }} <a [routerLink]="pokemon.id"><button>Details</button></a>
+  </li>
+</ul>
