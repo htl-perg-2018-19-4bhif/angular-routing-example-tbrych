@@ -1,3 +1,6 @@
+<p>Filter Pokemon: </p>
+<input type="text" [(ngModel)]="inputText" (input)="filterText()"/>
+
 <ul>
   <li *ngFor="let pokemon of pokemons.results">
     {{ pokemon.name }} <a [routerLink]="pokemon.id"><button>Details</button></a>

@@ -8,9 +8,12 @@ interface IPokemon {
 };
 
 interface IPokemons {
-  count?: number;
   results: IPokemon[];
 };
+
+interface ICount {
+  count: number;
+}
 
 @Component({
   selector: 'app-pokemons',
@@ -19,6 +22,8 @@ interface IPokemons {
 })
 export class PokemonsComponent implements OnInit {
   pokemons: IPokemons = { results: [] };
+  pokemonsBackup: IPokemons;
+  inputText: string = "";
 
   constructor(private http: HttpClient) { this.loadPokemon() }
 
@@ -26,10 +31,27 @@ export class PokemonsComponent implements OnInit {
   }
 
   async loadPokemon() {
-    this.pokemons = await this.http.get<IPokemons>("https://pokeapi.co/api/v2/pokemon?limit=1000").toPromise();
+    let numPokemon: ICount = await this.http.get<ICount>("https://pokeapi.co/api/v2/pokemon").toPromise();
     
-    for (let i = 0; i < this.pokemons.results.length; i++) {
-      this.pokemons.results[i].id = i+1;
+    this.pokemonsBackup = await this.http.get<IPokemons>(`https://pokeapi.co/api/v2/pokemon?limit=${numPokemon.count}}`).toPromise();
+
+    for (let i = 0; i < this.pokemonsBackup.results.length; i++) {
+      this.pokemonsBackup.results[i].id = i+1;
+    }
+
+    this.filterText();
+  }
+
+  filterText(){
+    this.pokemons.results = [];
+    if (this.inputText !== "undefined"){
+      for (let i = 0; i < this.pokemonsBackup.results.length; i++){
+        if (this.pokemonsBackup.results[i].name.includes(this.inputText)) {
+          this.pokemons.results.push(this.pokemonsBackup.results[i]);
+        }
+      }
+    } else {
+      this.pokemons = this.pokemonsBackup;
     }
   }
 }
